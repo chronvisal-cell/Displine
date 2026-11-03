@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="km" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រង និងចុះពង្រឹងវិន័យសាលារៀន</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font: Battambang & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Battambang', 'Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Battambang', 'Inter', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            main {
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+            /* Ensure tab contents are visible during print */
+            #tab-records {
+                display: block !important;
+            }
+            #tab-dashboard, #tab-checklist, #tab-admin {
+                display: none !important;
+            }
+            .shadow-sm, .shadow-xl, .shadow-2xl, .shadow {
+                box-shadow: none !important;
+            }
+            .border {
+                border-color: #cbd5e1 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-900 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="bg-indigo-700 p-2.5 rounded-xl shadow-inner text-amber-400 text-2xl">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-wide">ប្រព័ន្ធចុះពង្រឹងវិន័យសាលារៀន</h1>
+                    <p class="text-xs text-indigo-200">សម្រាប់គណៈកម្មការវិន័យ និងគ្រូបន្ទុកថ្នាក់</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-4 py-2 bg-indigo-800 hover:bg-indigo-700 rounded-lg text-sm font-medium transition flex items-center gap-2 border border-indigo-600 shadow-sm active">
+                    <i class="fa-solid fa-chart-pie"></i> ទិដ្ឋភាពទូទៅ
+                </button>
+                <button onclick="switchTab('checklist')" id="btn-checklist" class="px-4 py-2 hover:bg-indigo-800 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> បញ្ជីពិនិត្យថ្នាក់រៀន
+                </button>
+                <button onclick="switchTab('records')" id="btn-records" class="px-4 py-2 hover:bg-indigo-800 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                    <i class="fa-solid fa-clipboard-user"></i> កំណត់ហេតុវិន័យ
+                </button>
+                <button onclick="switchTab('admin')" id="btn-admin" class="px-4 py-2 hover:bg-indigo-800 rounded-lg text-sm font-medium transition flex items-center gap-2 text-amber-300">
+                    <i class="fa-solid fa-user-gear"></i> កំណត់ Admin
+                </button>
+                <button onclick="printReport()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-indigo-950 font-bold rounded-lg text-sm transition flex items-center gap-2 shadow">
+                    <i class="fa-solid fa-print"></i> បោះពុម្ពរបាយការណ៍
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 py-6 overflow-y-auto">
+
+        <!-- TAB 1: DASHBOARD -->
+        <div id="tab-dashboard" class="space-y-6">
+            <!-- Welcome Banner -->
+            <div class="bg-gradient-to-r from-indigo-800 to-blue-700 rounded-2xl p-6 text-white shadow-xl flex flex-col md:flex-row justify-between items-center gap-6">
+                <div>
+                    <span class="bg-amber-400 text-indigo-950 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider">ឆ្នាំសិក្សា ២០២៥ - ២០២៦</span>
+                    <h2 class="text-2xl md:text-3xl font-bold mt-2">សួស្តី, គណៈកម្មការគ្រូវិន័យ 👋</h2>
+                    <p class="text-indigo-100 text-sm mt-1 max-w-xl">សូមប្រើប្រាស់ប្រព័ន្ធនេះដើម្បីធ្វើការត្រួតពិនិត្យ វាយតម្លៃ និងកត់ត្រាអាកប្បកិរិយាសិស្សប្រចាំថ្ងៃប្រកបដោយតម្លាភាព និងប្រសិទ្ធភាពខ្ពស់។</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/20 text-center min-w-[200px]">
+                    <div class="text-xs text-indigo-200">ថ្ងៃទីសប្តាហ៍នេះ</div>
+                    <div class="text-lg font-bold text-amber-300" id="current-date-display">ថ្ងៃនេះ</div>
+                    <button onclick="switchTab('checklist')" class="mt-3 w-full py-2 bg-amber-400 hover:bg-amber-300 text-indigo-950 rounded-lg font-bold text-xs transition shadow">
+                        <i class="fa-solid fa-play"></i> ចាប់ផ្តើមពិនិត្យថ្នាក់រៀន
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">ថ្នាក់បានពិនិត្យសប្តាហ៍នេះ</p>
+                        <h3 class="text-2xl font-bold text-slate-800 mt-1" id="stat-checked-classes">0 / 24</h3>
+                        <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1"><i class="fa-solid fa-arrow-up"></i> រួចរាល់</span>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">សិស្សមកយឺតសរុប</p>
+                        <h3 class="text-2xl font-bold text-amber-600 mt-1" id="stat-late-students">0 នាក់</h3>
+                        <span class="text-xs text-amber-600 font-medium flex items-center gap-1 mt-1"><i class="fa-solid fa-triangle-exclamation"></i> ត្រូវយកចិត្តទុកដាក់</span>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">សិស្សអវត្តមានគ្មានច្បាប់</p>
+                        <h3 class="text-2xl font-bold text-rose-600 mt-1" id="stat-absent-students">0 នាក់</h3>
+                        <span class="text-xs text-rose-600 font-medium flex items-center gap-1 mt-1"><i class="fa-solid fa-circle-xmark"></i> កំពុងតាមដាន</span>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-user-slash"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-medium text-slate-500">ពិន្ទុវិន័យជាមធ្យម</p>
+                        <h3 class="text-2xl font-bold text-emerald-600 mt-1">94.5%</h3>
+                        <span class="text-xs text-emerald-600 font-medium flex items-center gap-1 mt-1"><i class="fa-solid fa-shield-check"></i> ល្អប្រសើរ</span>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Card & Guidelines -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Quick Guide -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-1">
+                    <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-indigo-600"></i> គោលការណ៍ណែនាំវិន័យ
+                    </h3>
+                    <ul class="space-y-3 text-sm text-slate-600">
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">១</span>
+                            <span>ចុះពិនិត្យសណ្តាប់ធ្នាប់អនាម័យ និងវត្តមានសិស្សឱ្យបានទៀងទាត់រៀងរាល់ម៉ោងសិក្សា។</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">២</span>
+                            <span>ពិនិត្យសម្លៀកបំពាក់ សក់ ក្រចក និងសម្ភារសិក្សារបស់សិស្ស។</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">៣</span>
+                            <span>ហាមឃាត់ដាច់ខាតការប្រើប្រាស់ទូរស័ព្ទ និងការនាំយកចំណីអាហារ/របស់ញ៉ាំចូលក្នុងថ្នាក់រៀន។</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <span class="bg-indigo-100 text-indigo-700 w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs">៤</span>
+                            <span>កត់ត្រារាល់កំហុសឆ្គង ឬសសើរលើកទឹកចិត្តចូលក្នុងប្រព័ន្ធភ្លាមៗ។</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Recent Inspections Table -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 lg:col-span-2">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-history text-indigo-600"></i> សកម្មភាពចុះពិនិត្យចុងក្រោយ
+                        </h3>
+                        <button onclick="switchTab('records')" class="text-xs text-indigo-600 hover:underline font-bold">មើលទាំងអស់</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-600">
+                            <thead class="bg-slate-100 text-slate-700 font-semibold uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">ថ្នាក់រៀន</th>
+                                    <th class="p-3">កាលបរិច្ឆេទ</th>
+                                    <th class="p-3">គ្រូពិនិត្យ</th>
+                                    <th class="p-3">ស្ថានភាព</th>
+                                    <th class="p-3 rounded-r-lg">ពិន្ទុវិន័យ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100" id="recent-records-table">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CHECKLIST FORM -->
+        <div id="tab-checklist" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-list text-indigo-600"></i> បញ្ជីពិនិត្យវិន័យប្រចាំថ្នាក់រៀន
+                            </h2>
+                            <span id="autosave-status" class="text-xs bg-emerald-100 text-emerald-700 font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 opacity-0 transition-opacity duration-300">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> បានរក្សាទុកស្វ័យប្រវត្តិ
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-500 mt-0.5">សូមជ្រើសរើសថ្នាក់ និងបំពេញសូចនាករវិន័យខាងក្រោម (ទិន្នន័យរក្សាទុកស្វ័យប្រវត្តពេលវាយបញ្ចូល)</p>
+                    </div>
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <select id="select-class" onchange="autoSaveForm()" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-indigo-600 font-medium">
+                            <!-- Populated dynamically via JS -->
+                        </select>
+                        <input type="date" id="inspection-date" onchange="autoSaveForm()" class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-4 py-2.5 outline-none focus:border-indigo-600 font-medium">
+                    </div>
+                </div>
+
+                <!-- Inspection Checklist Categories -->
+                <form id="discipline-form" onsubmit="saveInspection(event)" class="mt-6 space-y-6">
+                    
+                    <!-- Section 1: Attendance & Punctuality -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-900 text-md mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-user-clock text-indigo-600"></i> ១. វត្តមាន និងភាពទាន់ពេលវេលា
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-center justify-between bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm">
+                                <span class="text-sm font-medium text-slate-700">សិស្សមកយឺត (បញ្ជាក់ចំនួន)</span>
+                                <input type="number" min="0" value="0" id="num-late" oninput="autoSaveForm()" class="w-20 bg-slate-100 border border-slate-300 text-center rounded-lg py-1 text-sm font-bold">
+                            </div>
+                            <div class="flex items-center justify-between bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm">
+                                <span class="text-sm font-medium text-slate-700">សិស្សអវត្តមានគ្មានច្បាប់</span>
+                                <input type="number" min="0" value="0" id="num-absent" oninput="autoSaveForm()" class="w-20 bg-slate-100 border border-slate-300 text-center rounded-lg py-1 text-sm font-bold">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section 2: Uniform & Appearance -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-900 text-md mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-shirt text-indigo-600"></i> ២. សម្លៀកបំពាក់ និងសណ្តាប់ធ្នាប់ផ្ទាល់ខ្លួន
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-uniform" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">ស្លៀកពាក់ឯកសណ្ឋានត្រឹមត្រូវ</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-hair" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">សក់កាត់ខ្លី/សមរម្យ</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-nails" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">ក្រចកដៃកាត់ខ្លី និងស្អាត</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section 3: Classroom Environment & Materials -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-900 text-md mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-indigo-600"></i> ៣. បរិស្ថានថ្នាក់រៀន និងសម្ភារសិក្សា
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-clean" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">អនាម័យក្នុងថ្នាក់ស្អាតល្អ</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-books" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">មានសៀវភៅ និងសម្ភារគ្រប់គ្រាន់</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-order" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">សណ្តាប់ធ្នាប់ពេលរៀនល្អ</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-phone" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">មិនមានទូរស័ព្ទ (មិនលួចប្រើ)</span>
+                            </label>
+                            <label class="flex items-center gap-3 bg-white p-3.5 rounded-lg border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 transition">
+                                <input type="checkbox" checked id="chk-food" onchange="autoSaveForm()" class="w-5 h-5 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500">
+                                <span class="text-sm font-medium text-slate-700">មិនមានរបស់ញ៉ាំក្នុងថ្នាក់</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Section 4: Comments and Notes -->
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                        <h3 class="font-bold text-indigo-900 text-md mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-indigo-600"></i> ៤. មតិយោបល់ និងចំណាំរបស់គ្រូវិន័យ
+                        </h3>
+                        <textarea id="inspection-notes" oninput="autoSaveForm()" rows="3" placeholder="សរសេរការសង្កេត បញ្ហាប្រឈម ឬសំណូមពរផ្សេងៗនៅទីនេះ..." class="w-full bg-white border border-slate-300 rounded-xl p-3 text-sm outline-none focus:border-indigo-600"></textarea>
+                    </div>
+
+                    <!-- Action Submit Button -->
+                    <div class="flex justify-end gap-3 pt-4">
+                        <button type="button" onclick="switchTab('dashboard')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold text-sm transition">បោះបង់</button>
+                        <button type="submit" class="px-6 py-2.5 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl font-bold text-sm transition shadow-lg flex items-center gap-2">
+                            <i class="fa-solid fa-floppy-disk"></i> រក្សាទុករបាយការណ៍វិន័យ
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 3: RECORDS HISTORY -->
+        <div id="tab-records" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-user text-indigo-600"></i> ប្រវត្តិ និងកំណត់ហេតុការចុះពង្រឹងវិន័យ
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-0.5">បញ្ជីរាយនាមរបាយការណ៍ទាំងអស់ដែលបានចុះហាត់ថលេខា និងរក្សាទុកក្នុងប្រព័ន្ធ</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="search-filter" onkeyup="filterRecords()" placeholder="ស្វែងរកតាមថ្នាក់..." class="bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl px-4 py-2 outline-none focus:border-indigo-600">
+                        <button onclick="clearAllRecords()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-xl text-sm font-bold transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-trash-can"></i> សម្អាតទិន្នន័យ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="mt-6 overflow-x-auto">
+                    <table class="w-full text-left text-sm text-slate-600">
+                        <thead class="bg-slate-100 text-slate-700 font-semibold uppercase text-xs">
+                            <tr>
+                                <th class="p-3.5 rounded-l-lg">ថ្នាក់រៀន</th>
+                                <th class="p-3.5">កាលបរិច្ឆេទ</th>
+                                <th class="p-3.5">មកយឺត</th>
+                                <th class="p-3.5">អវត្តមាន</th>
+                                <th class="p-3.5">មតិយោបល់/ចំណាំ</th>
+                                <th class="p-3.5">ពិន្ទុវិន័យ</th>
+                                <th class="p-3.5 rounded-r-lg text-center">សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100" id="full-records-table">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ADMIN SETTINGS -->
+        <div id="tab-admin" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-user-gear text-indigo-600"></i> កំណត់បញ្ជីថ្នាក់រៀន (Admin Management)
+                        </h2>
+                        <p class="text-sm text-slate-500 mt-0.5">បន្ថែម ឬលុបឈ្មោះថ្នាក់រៀនដែលត្រូវចុះពង្រឹងវិន័យ</p>
+                    </div>
+                </div>
+
+                <!-- Add New Class Form -->
+                <div class="mt-6 bg-slate-50 p-5 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-plus text-indigo-600"></i> បន្ថែមថ្នាក់រៀនថ្មី
+                    </h3>
+                    <form onsubmit="addClass(event)" class="flex gap-3 max-w-md">
+                        <input type="text" id="new-class-input" placeholder="ឧទាហរណ៍៖ ថ្នាក់ទី ៧គ" required class="flex-grow bg-white border border-slate-300 text-slate-800 text-sm rounded-xl px-4 py-2 outline-none focus:border-indigo-600">
+                        <button type="submit" class="px-5 py-2 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl text-sm font-bold transition flex items-center gap-1.5 shadow">
+                            <i class="fa-solid fa-plus"></i> បន្ថែម
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Current Class List -->
+                <div class="mt-6">
+                    <h3 class="font-bold text-slate-800 text-md mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-list text-indigo-600"></i> បញ្ជីថ្នាក់រៀនដែលមានស្រាប់
+                    </h3>
+                    <div id="class-list-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Notification Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-28 transition-transform duration-300 z-50">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg"></i>
+        <span id="toast-message" class="text-sm font-medium">រក្សាទុកបានដោយជោគជ័យ!</span>
+    </div>
+
+    <!-- Custom Modal for Delete Confirmation -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl space-y-4">
+            <h3 class="text-lg font-bold text-slate-800" id="modal-title">បញ្ជាក់ការលុប</h3>
+            <p class="text-sm text-slate-600" id="modal-message">តើអ្នកពិតជាចង់លុបទិន្នន័យនេះមែនទេ?</p>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition">បោះបង់</button>
+                <button id="modal-confirm-btn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-sm font-bold transition">លុប</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+        <p>ប្រព័ន្ធគ្រប់គ្រងវិន័យសាលារៀនទំនើប © ២០២៦ | រក្សាសិទ្ធិគ្រប់យ៉ាង</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const defaultClasses = [
+            "ថ្នាក់ទី ៧ក", "ថ្នាក់ទី ៧ខ", "ថ្នាក់ទី ៨ក", "ថ្នាក់ទី ៨ខ", 
+            "ថ្នាក់ទី ៩ក", "ថ្នាក់ទី ១០ក", "ថ្នាក់ទី ១១ក", "ថ្នាក់ទី ១២ក"
+        ];
+
+        function getClasses() {
+            const stored = localStorage.getItem('school_discipline_classes');
+            if (!stored) {
+                localStorage.setItem('school_discipline_classes', JSON.stringify(defaultClasses));
+                return defaultClasses;
+            }
+            return JSON.parse(stored);
+        }
+
+        function saveClasses(classList) {
+            localStorage.setItem('school_discipline_classes', JSON.stringify(classList));
+            renderClasses();
+        }
+
+        function renderClasses() {
+            const classes = getClasses();
+            
+            // Render select dropdown in Checklist form
+            const selectClass = document.getElementById('select-class');
+            const currentSelected = selectClass.value;
+            selectClass.innerHTML = "";
+            classes.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = c;
+                selectClass.appendChild(opt);
+            });
+            if (currentSelected && classes.includes(currentSelected)) {
+                selectClass.value = currentSelected;
+            }
+
+            // Render Admin Class List
+            const adminContainer = document.getElementById('class-list-container');
+            if (adminContainer) {
+                adminContainer.innerHTML = "";
+                classes.forEach(c => {
+                    adminContainer.innerHTML += `
+                        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-sm">
+                            <span class="font-bold text-slate-700 text-sm"><i class="fa-solid fa-graduation-cap text-indigo-500 mr-2"></i>${c}</span>
+                            <button onclick="removeClass('${c}')" class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-lg transition" title="លុបថ្នាក់">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function addClass(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-class-input');
+            const className = input.value.trim();
+            if (!className) return;
+
+            const classes = getClasses();
+            if (classes.includes(className)) {
+                showToast("ថ្នាក់រៀននេះមានរួចហើយ!", true);
+                return;
+            }
+
+            classes.push(className);
+            saveClasses(classes);
+            input.value = "";
+            showToast(`បានបន្ថែម ${className} ដោយជោគជ័យ!`);
+        }
+
+        function removeClass(className) {
+            showModal("បញ្ជាក់ការលុបថ្នាក់", `តើអ្នកពិតជាចង់លុប "${className}" ចេញពីបញ្ជីមែនទេ?`, () => {
+                let classes = getClasses();
+                classes = classes.filter(c => c !== className);
+                saveClasses(classes);
+                showToast(`បានលុប ${className} រួចរាល់`, true);
+            });
+        }
+
+        const defaultRecords = [
+            { id: 1, class: "ថ្នាក់ទី ១២ក", date: "2026-11-03", late: 1, absent: 0, notes: "សិស្សអនុវត្តសណ្តាប់ធ្នាប់បានយ៉ាងល្អប្រសើរ។", score: "98%" },
+            { id: 2, class: "ថ្នាក់ទី ១១ក", date: "2026-11-02", late: 3, absent: 1, notes: "មានសិស្សមកយឺតម៉ោងទី១ ចំនួន៣នាក់ បានណែនាំអប់រំ។", score: "90%" },
+            { id: 3, class: "ថ្នាក់ទី ៩ក", date: "2026-11-02", late: 0, absent: 2, notes: "អវត្តមានសិស្ស២នាក់ដោយគ្មានច្បាប់ នឹងហៅអាណាព្យាបាល។", score: "88%" }
+        ];
+
+        function getRecords() {
+            const stored = localStorage.getItem('school_discipline_records');
+            if (!stored) {
+                localStorage.setItem('school_discipline_records', JSON.stringify(defaultRecords));
+                return defaultRecords;
+            }
+            return JSON.parse(stored);
+        }
+
+        function saveRecords(records) {
+            localStorage.setItem('school_discipline_records', JSON.stringify(records));
+        }
+
+        // Auto-Save Draft Functions
+        let autoSaveTimeout = null;
+        function autoSaveForm() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                const formData = {
+                    class: document.getElementById('select-class').value,
+                    date: document.getElementById('inspection-date').value,
+                    late: document.getElementById('num-late').value,
+                    absent: document.getElementById('num-absent').value,
+                    uniform: document.getElementById('chk-uniform').checked,
+                    hair: document.getElementById('chk-hair').checked,
+                    nails: document.getElementById('chk-nails').checked,
+                    clean: document.getElementById('chk-clean').checked,
+                    books: document.getElementById('chk-books').checked,
+                    order: document.getElementById('chk-order').checked,
+                    phone: document.getElementById('chk-phone') ? document.getElementById('chk-phone').checked : true,
+                    food: document.getElementById('chk-food') ? document.getElementById('chk-food').checked : true,
+                    notes: document.getElementById('inspection-notes').value
+                };
+                localStorage.setItem('school_discipline_draft', JSON.stringify(formData));
+
+                // Show visual feedback
+                const status = document.getElementById('autosave-status');
+                if (status) {
+                    status.classList.remove('opacity-0');
+                    setTimeout(() => {
+                        status.classList.add('opacity-0');
+                    }, 2000);
+                }
+            }, 400);
+        }
+
+        function restoreDraftForm() {
+            const draft = localStorage.getItem('school_discipline_draft');
+            if (draft) {
+                try {
+                    const data = JSON.parse(draft);
+                    if (data.class) document.getElementById('select-class').value = data.class;
+                    if (data.date) document.getElementById('inspection-date').value = data.date;
+                    if (data.late !== undefined) document.getElementById('num-late').value = data.late;
+                    if (data.absent !== undefined) document.getElementById('num-absent').value = data.absent;
+                    if (data.uniform !== undefined) document.getElementById('chk-uniform').checked = data.uniform;
+                    if (data.hair !== undefined) document.getElementById('chk-hair').checked = data.hair;
+                    if (data.nails !== undefined) document.getElementById('chk-nails').checked = data.nails;
+                    if (data.clean !== undefined) document.getElementById('chk-clean').checked = data.clean;
+                    if (data.books !== undefined) document.getElementById('chk-books').checked = data.books;
+                    if (data.order !== undefined) document.getElementById('chk-order').checked = data.order;
+                    if (data.phone !== undefined && document.getElementById('chk-phone')) document.getElementById('chk-phone').checked = data.phone;
+                    if (data.food !== undefined && document.getElementById('chk-food')) document.getElementById('chk-food').checked = data.food;
+                    if (data.notes !== undefined) document.getElementById('inspection-notes').value = data.notes;
+                } catch(e) {
+                    console.error("Could not restore draft", e);
+                }
+            }
+        }
+
+        function clearDraft() {
+            localStorage.removeItem('school_discipline_draft');
+        }
+
+        // Updated reliable print function for embedded preview & regular window
+        function printReport() {
+            const records = getRecords();
+            if (!records || records.length === 0) {
+                showToast("គ្មានទិន្នន័យសម្រាប់បោះពុម្ពឡើយ!", true);
+                return;
+            }
+
+            // Create custom printable window formatted according to Cambodian Administrative Rules
+            const printWin = window.open('', '_blank', 'width=900,height=700');
+            if (!printWin) {
+                switchTab('records');
+                setTimeout(() => { window.print(); }, 200);
+                return;
+            }
+
+            const today = new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            
+            let tableRows = '';
+            records.forEach((r, idx) => {
+                tableRows += `
+                    <tr style="border-bottom: 1px solid #cbd5e1; text-align: center;">
+                        <td style="padding: 8px; border: 1px solid #94a3b8;">${idx + 1}</td>
+                        <td style="padding: 8px; font-weight: bold; text-align: left; border: 1px solid #94a3b8;">${r.class}</td>
+                        <td style="padding: 8px; border: 1px solid #94a3b8;">${r.date}</td>
+                        <td style="padding: 8px; color: #b45309; font-weight: bold; border: 1px solid #94a3b8;">${r.late} នាក់</td>
+                        <td style="padding: 8px; color: #b91c1c; font-weight: bold; border: 1px solid #94a3b8;">${r.absent} នាក់</td>
+                        <td style="padding: 8px; text-align: left; font-size: 13px; border: 1px solid #94a3b8;">${r.notes}</td>
+                        <td style="padding: 8px; font-weight: bold; color: #1e1b4b; border: 1px solid #94a3b8;">${r.score}</td>
+                    </tr>
+                `;
+            });
+
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html lang="km">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>របាយការណ៍ចុះពង្រឹងវិន័យសាលារៀន (ទម្រង់រដ្ឋបាល)</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Moul&family=Battambang:wght@400;700&display=swap" rel="stylesheet">
+                    <style>
+                        body { 
+                            font-family: 'Battambang', sans-serif; 
+                            padding: 40px 50px; 
+                            color: #0f172a; 
+                            line-height: 1.6;
+                        }
+                        .kh-moul { font-family: 'Moul', serif; }
+                        
+                        /* Header Administrative Layout */
+                        .admin-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 25px;
+                        }
+                        .header-left {
+                            text-align: center;
+                            font-size: 14px;
+                        }
+                        .header-right {
+                            text-align: center;
+                            font-size: 14px;
+                        }
+                        .header-right .motto {
+                            font-size: 13px;
+                            margin-top: 3px;
+                        }
+                        
+                        /* Title Section */
+                        .doc-title {
+                            text-align: center;
+                            margin: 30px 0 20px 0;
+                        }
+                        .doc-title h1 {
+                            font-size: 18px;
+                            margin: 0;
+                        }
+                        .doc-title p {
+                            font-size: 13px;
+                            margin-top: 4px;
+                            color: #475569;
+                        }
+
+                        /* Table Rules */
+                        table { 
+                            width: 100%; 
+                            border-collapse: collapse; 
+                            margin-top: 15px; 
+                            font-size: 13px; 
+                        }
+                        th { 
+                            background-color: #f8fafc; 
+                            color: #0f172a; 
+                            padding: 10px 8px; 
+                            border: 1px solid #94a3b8; 
+                            font-weight: bold;
+                        }
+
+                        /* Footer Signatures according to Khmer Admin rules */
+                        .admin-footer {
+                            margin-top: 40px;
+                            display: flex;
+                            justify-content: space-between;
+                            font-size: 14px;
+                        }
+                        .sign-box-left {
+                            text-align: center;
+                            width: 250px;
+                        }
+                        .sign-box-right {
+                            text-align: center;
+                            width: 280px;
+                        }
+                        .sign-space {
+                            height: 90px;
+                        }
+                        @media print {
+                            body { padding: 20px; }
+                        }
+                    </style>
+                </head>
+                <body>
+
+                    <!-- Top Administrative Header -->
+                    <div class="admin-header">
+                        <div class="header-left">
+                            <div class="kh-moul" style="font-size:13px;">ក្រសួងអប់រំ យុវជន និងកីឡា</div>
+                            <div style="font-size:13px; font-weight:bold;">សាលារៀន ៖ .............................................</div>
+                            <div style="font-size:12px;">លេខ ៖ .................... រ.ប</div>
+                        </div>
+                        <div class="header-right">
+                            <div class="kh-moul" style="font-size:14px;">ព្រះរាជាណាចក្រកម្ពុជា</div>
+                            <div class="kh-moul" style="font-size:13px;">ជាតិ សាសនា ព្រះមហាក្សត្រ</div>
+                            <div class="motto"><img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Symbol_of_Cambodia_Header_Line.svg" style="width:120px; display:inline-block; margin-top:2px;" alt=""></div>
+                        </div>
+                    </div>
+
+                    <!-- Document Title -->
+                    <div class="doc-title">
+                        <h1 class="kh-moul">របាយការណ៍លទ្ធផលនៃការចុះពង្រឹងវិន័យសិស្ស</h1>
+                        <p>ប្រកាស និងកត់ត្រាលទ្ធផលត្រួតពិនិត្យអាកប្បកិរិយា និងសណ្តាប់ធ្នាប់តាមថ្នាក់រៀន</p>
+                    </div>
+
+                    <!-- Main Report Data Table -->
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">ល.រ</th>
+                                <th style="text-align: left; width: 120px;">ថ្នាក់រៀន</th>
+                                <th style="width: 100px;">កាលបរិច្ឆេទ</th>
+                                <th style="width: 80px;">មកយឺត</th>
+                                <th style="width: 80px;">អវត្តមាន</th>
+                                <th style="text-align: left;">មតិយោបល់ / កត់សម្គាល់</th>
+                                <th style="width: 80px;">ពិន្ទុវិន័យ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+
+                    <!-- Administrative Signatures -->
+                    <div class="admin-footer">
+                        <!-- Left Approval -->
+                        <div class="sign-box-left">
+                            <div>បានឃើញ និងពិនិត្យត្រឹមត្រូវ</div>
+                            <div class="kh-moul" style="font-size:12px; margin-top:3px;">ជ. នាយកសាលា</div>
+                            <div style="font-size:13px; font-weight:bold;">ប្រធានការិយាល័យ / ទទួលបន្ទុករដ្ឋបាល</div>
+                            <div class="sign-space"></div>
+                            <div style="border-bottom: 1px dotted #94a3b8; width: 80%; margin: 0 auto;"></div>
+                        </div>
+
+                        <!-- Right Preparation -->
+                        <div class="sign-box-right">
+                            <div>ធ្វើនៅ......................, ថ្ងៃទី....... ខែ....... ឆ្នាំ២០...</div>
+                            <div class="kh-moul" style="font-size:12px; margin-top:3px;">រៀបចំដោយ</div>
+                            <div style="font-size:13px; font-weight:bold;">ប្រធានគណៈកម្មការចុះពង្រឹងវិន័យ</div>
+                            <div class="sign-space"></div>
+                            <div style="border-bottom: 1px dotted #94a3b8; width: 80%; margin: 0 auto;"></div>
+                        </div>
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            window.print();
+                            window.onafterprint = function() { window.close(); };
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        document.getElementById('inspection-date').valueAsDate = new Date();
+        document.getElementById('current-date-display').textContent = new Date().toLocaleDateString('km-KH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        function switchTab(tabId) {
+            ['dashboard', 'checklist', 'records', 'admin'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`btn-${t}`);
+                if (btn) {
+                    btn.classList.remove('bg-indigo-800', 'border', 'border-indigo-600', 'shadow-sm');
+                }
+            });
+
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-indigo-800', 'border', 'border-indigo-600', 'shadow-sm');
+            }
+            renderData();
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-message');
+            const icon = document.getElementById('toast-icon');
+
+            msg.textContent = message;
+            if (isError) {
+                icon.className = "fa-solid fa-circle-xmark text-rose-400 text-lg";
+            } else {
+                icon.className = "fa-solid fa-circle-check text-emerald-400 text-lg";
+            }
+
+            toast.classList.remove('translate-y-28');
+            setTimeout(() => {
+                toast.classList.add('translate-y-28');
+            }, 3000);
+        }
+
+        let onConfirmAction = null;
+        function showModal(title, message, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            onConfirmAction = onConfirm;
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('confirm-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('modal-confirm-btn').onclick = function() {
+            if (onConfirmAction) onConfirmAction();
+            closeModal();
+        };
+
+        function saveInspection(e) {
+            e.preventDefault();
+            const className = document.getElementById('select-class').value;
+            const date = document.getElementById('inspection-date').value;
+            const late = parseInt(document.getElementById('num-late').value) || 0;
+            const absent = parseInt(document.getElementById('num-absent').value) || 0;
+            const notes = document.getElementById('inspection-notes').value || "គ្មានមតិយោបល់បន្ថែម។";
+
+            let scoreNum = 100 - (late * 2) - (absent * 5);
+            if (scoreNum < 50) scoreNum = 50;
+            const score = scoreNum + "%";
+
+            const newRecord = {
+                id: Date.now(),
+                class: className,
+                date: date,
+                late: late,
+                absent: absent,
+                notes: notes,
+                score: score
+            };
+
+            const records = getRecords();
+            records.unshift(newRecord);
+            saveRecords(records);
+
+            clearDraft(); // Clean draft on successful save
+
+            showToast("បានរក្សាទុករបាយការណ៍វិន័យដោយជោគជ័យ!");
+            document.getElementById('discipline-form').reset();
+            document.getElementById('inspection-date').valueAsDate = new Date();
+            switchTab('records');
+        }
+
+        function renderData() {
+            const records = getRecords();
+            
+            document.getElementById('stat-checked-classes').textContent = `${Math.min(records.length, 24)} / 24`;
+            
+            let totalLate = records.reduce((sum, r) => sum + r.late, 0);
+            let totalAbsent = records.reduce((sum, r) => sum + r.absent, 0);
+            
+            document.getElementById('stat-late-students').textContent = `${totalLate} នាក់`;
+            document.getElementById('stat-absent-students').textContent = `${totalAbsent} នាក់`;
+
+            const recentTable = document.getElementById('recent-records-table');
+            recentTable.innerHTML = "";
+            records.slice(0, 4).forEach(r => {
+                recentTable.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 font-semibold text-slate-800">${r.class}</td>
+                        <td class="p-3 text-slate-500">${r.date}</td>
+                        <td class="p-3">គណៈកម្មការវិន័យ</td>
+                        <td class="p-3"><span class="bg-emerald-100 text-emerald-700 text-xs px-2.5 py-1 rounded-full font-medium">បានពិនិត្យ</span></td>
+                        <td class="p-3 font-bold text-indigo-600">${r.score}</td>
+                    </tr>
+                `;
+            });
+
+            const fullTable = document.getElementById('full-records-table');
+            fullTable.innerHTML = "";
+            records.forEach(r => {
+                fullTable.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3.5 font-semibold text-slate-800">${r.class}</td>
+                        <td class="p-3.5 text-slate-500">${r.date}</td>
+                        <td class="p-3.5"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold text-xs">${r.late} នាក់</span></td>
+                        <td class="p-3.5"><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-bold text-xs">${r.absent} នាក់</span></td>
+                        <td class="p-3.5 max-w-xs truncate text-slate-600" title="${r.notes}">${r.notes}</td>
+                        <td class="p-3.5 font-bold text-indigo-600">${r.score}</td>
+                        <td class="p-3.5 text-center">
+                            <button onclick="deleteRecord(${r.id})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="លុប">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteRecord(id) {
+            showModal("បញ្ជាក់ការលុប", "តើអ្នកពិតជាចង់លុបទិន្នន័យនេះមែនទេ?", () => {
+                let records = getRecords();
+                records = records.filter(r => r.id !== id);
+                saveRecords(records);
+                renderData();
+                showToast("បានលុបទិន្នន័យដោយជោគជ័យ", true);
+            });
+        }
+
+        function clearAllRecords() {
+            showModal("សម្អាតទិន្នន័យ", "តើអ្នកចង់លុបទិន្នន័យប្រវត្តិទាំងអស់មែនទេ?", () => {
+                localStorage.removeItem('school_discipline_records');
+                renderData();
+                showToast("បានសម្អាតទិន្នន័យទាំងអស់", true);
+            });
+        }
+
+        function filterRecords() {
+            const query = document.getElementById('search-filter').value.toLowerCase();
+            const records = getRecords();
+            const filtered = records.filter(r => r.class.toLowerCase().includes(query));
+            
+            const fullTable = document.getElementById('full-records-table');
+            fullTable.innerHTML = "";
+            filtered.forEach(r => {
+                fullTable.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3.5 font-semibold text-slate-800">${r.class}</td>
+                        <td class="p-3.5 text-slate-500">${r.date}</td>
+                        <td class="p-3.5"><span class="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-md font-bold text-xs">${r.late} នាក់</span></td>
+                        <td class="p-3.5"><span class="bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-bold text-xs">${r.absent} នាក់</span></td>
+                        <td class="p-3.5 max-w-xs truncate text-slate-600" title="${r.notes}">${r.notes}</td>
+                        <td class="p-3.5 font-bold text-indigo-600">${r.score}</td>
+                        <td class="p-3.5 text-center">
+                            <button onclick="deleteRecord(${r.id})" class="p-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition" title="លុប">
+                                <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.onload = function() {
+            renderClasses();
+            restoreDraftForm();
+            renderData();
+        }
+    </script>
+</body>
+</html>
